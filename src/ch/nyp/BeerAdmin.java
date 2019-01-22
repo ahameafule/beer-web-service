@@ -14,19 +14,22 @@ import org.json.JSONObject;
 public class BeerAdmin {
 
 	String url = "http://api.brewerydb.com/v2/";
-	String apiKey = "?key=1511d0db4a1d6841481c672455358cff";
+	String apiKey = "key=1511d0db4a1d6841481c672455358cff";
 
 	HashMap<Integer, String> beerStyles;
+	HashMap<String, Beer> beerList;
 	
 	public static void main(String[] args) {
 		BeerAdmin ba = new BeerAdmin();
 		ba.loadBeerStyles();
 		//ba.printBeerStyles();
-		ba.printBeerStyles("Pale");
+		//ba.printBeerStyles("Pale");
+		ba.getBeerListForStyle(5);
+		ba.printBeerList();
 	}
 
 	public void loadBeerStyles() {
-		String urlExtension = "styles/";
+		String urlExtension = "styles/?";
 		JSONObject object = getObject(url + urlExtension + apiKey);
 
 		beerStyles = new HashMap<Integer, String>();
@@ -38,10 +41,12 @@ public class BeerAdmin {
 		}
 	}
 
-	public void printBeerStyles() {
+	public String printBeerStyles() {
+		StringBuilder text = new StringBuilder();
 		for (Integer key : beerStyles.keySet()) {
-			System.out.println(key + "::" + beerStyles.get(key));
+			text.append(key + "::" + beerStyles.get(key) + "\n");
 		}
+		return text.toString();
 	}
 
 	public void printBeerStyles(String search) {
@@ -53,7 +58,32 @@ public class BeerAdmin {
 	}
 
 	public void getBeerListForStyle(int idStyle) {
-		String urlExtension = "&styleId=";
+		String urlExtension = "beers/?styleId=" + idStyle + "&";
+		JSONObject object = getObject(url + urlExtension + apiKey);
+		Beer beer;
+		beerList = new HashMap<String, Beer>();
+		
+		for (int i = 0; i < object.getJSONArray("data").length(); i++) {
+			String id = object.getJSONArray("data").getJSONObject(i).getString("id");
+			String name = object.getJSONArray("data").getJSONObject(i).getString("name");
+			String description = object.getJSONArray("data").getJSONObject(i).getJSONObject("style").getString("description");
+			beer = new Beer(id, name, description, idStyle);
+			beerList.put(beer.getId(), beer);
+		}
+	}
+	
+	public void printBeerList() {
+		for (String key : beerList.keySet()) {
+			System.out.println(key + "::" + beerList.get(key).getName());
+		}
+	}
+	
+	public void printBeerList(String id) {
+		for (String key : beerList.keySet()) {
+			if (key.equals(id)) {
+				System.out.println(key + "::" + beerList.get(key).getName());
+			}
+		}
 	}
 
 	private JSONObject getObject(String link) {
