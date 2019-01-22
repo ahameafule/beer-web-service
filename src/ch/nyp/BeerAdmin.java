@@ -21,7 +21,8 @@ public class BeerAdmin {
 	public static void main(String[] args) {
 		BeerAdmin ba = new BeerAdmin();
 		ba.loadBeerStyles();
-		ba.printBeerStyles();
+		//ba.printBeerStyles();
+		ba.printBeerStyles("Pale");
 	}
 
 	public void loadBeerStyles() {
@@ -39,16 +40,20 @@ public class BeerAdmin {
 
 	public void printBeerStyles() {
 		for (Integer key : beerStyles.keySet()) {
-			System.out.println("Key: " + key + " Value: " + beerStyles.get(key));
+			System.out.println(key + "::" + beerStyles.get(key));
 		}
 	}
 
 	public void printBeerStyles(String search) {
-
+		for (Integer key : beerStyles.keySet()) {
+			if (beerStyles.get(key).contains(search)) {
+				System.out.println(key + "::" + beerStyles.get(key));
+			}	
+		}
 	}
 
 	public void getBeerListForStyle(int idStyle) {
-
+		String urlExtension = "&styleId=";
 	}
 
 	private JSONObject getObject(String link) {
